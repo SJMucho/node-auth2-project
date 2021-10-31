@@ -6,7 +6,13 @@ const restricted = (req, res, next) => {
   if (!token) {
     res.status(401).json("Token required");
   } else {
-    JWT_SECRET.verify();
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(401).json("Token invalid" + err.message);
+      } else {
+        req.decodedToken = decodednext();
+      }
+    });
   }
   /*
     If the user does not provide a token in the Authorization header:
