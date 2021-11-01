@@ -10,7 +10,7 @@ const restricted = (req, res, next) => {
       if (err) {
         res.status(401).json("Token invalid" + err.message);
       } else {
-        req.decodedToken = decodednext();
+        req.decodedToken = decoded;
       }
     });
   }
@@ -32,6 +32,11 @@ const restricted = (req, res, next) => {
 };
 
 const only = (role_name) => (req, res, next) => {
+  if (req.decodedToken.role_name === role_name) {
+    next();
+  } else {
+    res.status(403).json("This is not for you");
+  }
   /*
     If the user does not provide a token in the Authorization header with a role_name
     inside its payload matching the role_name passed to this function as its argument:
@@ -45,6 +50,13 @@ const only = (role_name) => (req, res, next) => {
 };
 
 const checkUsernameExists = (req, res, next) => {
+  const { username } = req.query;
+
+  if (!username) {
+    res.status(401).json("Invalid credentials");
+  } else {
+    next();
+  }
   /*
     If the username in req.body does NOT exist in the database
     status 401
